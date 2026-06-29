@@ -41,6 +41,7 @@ system_prompt = """
 messages = [
     {"role": "system", "content": system_prompt},
     {"role": "user", "content": "What is a black hole & why is it black? Respond in json"} ### VERY VERY IMPORTANT: If you want response in json then you must include the word "json" in the user input. If you don't include it then the model will throw an error. This is because the model is not able to understand that you want the response in json format. So, always include the word "json" in the user input if you want the response in json format.
+    ### You can also write this in the system_query. That would also work!!
 ]
 
 
