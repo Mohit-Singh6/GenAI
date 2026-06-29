@@ -28,12 +28,21 @@ def get_weather (city: str):
     return "Couldn't fetch the weather"
 
 def run_command (command: str):
-    subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    print("\n",result.stdout,"\n")
+    if (result.returncode == 0): # 0 means no error, rest any number means erro
+        return result.stdout
+    else:
+        return result.stderr
 
 Available_Tools = {
     "get_weather": {
         "fn": get_weather,
         "description": "This function takes city as input and returns the weather in that city."
+    },
+    "run_command": {
+        "fn": run_command,
+        "description": "Runs command on the system by taking string of command as input"
     }
 }
 
@@ -57,7 +66,13 @@ system_prompt = """
     - get_weather: This function takes city as input and returns the weather in that city.
     - run_command: Runs command on the system by taking string of command as input 
 
+    Important Note:
+    - when using the run_command tool, and using it to create or update any text in a file, don't add extra quotes or single quotes, because then they are also added in the file.
+    - Example: 
+        WRONG:  don't write the input as "echo 'Hello' > motivate.md" - this is wrong!
+        CORRECT: Write the input as "echo Hello > motivate.md"
 
+    
     Example:
     Input: What is the weather of delhi?
     Output: {{ "step": "start", "content": "The user wants to know weather of delhi."}}
@@ -76,59 +91,57 @@ messages = [
 ]
 
 
-user_query = input("Enter query: ")
+while True:
+    user_query = input("Enter query: ") # Create a new file named raju.txt in the current directory and write "Hello, RAJU!" in that file.
 
-messages.append({"role": "user", "content": "What is the weather in mumbai right now? in k?"})
+    messages.append({"role": "user", "content": user_query})
 
-maxCalls = 10 # Safety net that will stop the loop after 10 calls to the model. This is to prevent infinite loops in case the model does not return the expected output.
+    while True:
 
-while True and maxCalls > 0:
-    maxCalls -= 1 
-
-    try:
-        chat_completion = client.chat.completions.create(
-            model=PRIMARY_MODEL,
-            messages=messages,
-            temperature=0.5,
-            max_completion_tokens=250,
-            # 👇 This forces Groq to return raw JSON matching your system prompt rules!
-            response_format={"type": "json_object"} 
-        )
-    except:
-        # 👇 AUTOMATIC FALLBACK: If 70B is maxed out, use Llama 4 Scout instantly
-        print("\nPrimary model LIMTI REACHED! Changing to fallback model....\n")
-        chat_completion = client.chat.completions.create(
-            model=FALLBACK_MODEL,
-            messages=messages,
-            temperature=0.5,
-            max_completion_tokens=250,
-            # 👇 This forces Groq to return raw JSON matching your system prompt rules!
-            response_format={"type": "json_object"} 
-        )
-    
-    print(chat_completion.choices[0].message.content)
-    print ("\n--------------\n")
-
-    parsed_resp = json.loads(chat_completion.choices[0].message.content) # Parsed response to a python object
-    step = parsed_resp.get('step')
-
-    messages.append({"role": "assistant", "content": chat_completion.choices[0].message.content})
-
-    if step == 'action':
-        fn_input = parsed_resp.get('input')
-        fn_name = parsed_resp.get('function')
+        try:
+            chat_completion = client.chat.completions.create(
+                model=PRIMARY_MODEL,
+                messages=messages,
+                temperature=0.5,
+                max_completion_tokens=250,
+                # 👇 This forces Groq to return raw JSON matching your system prompt rules!
+                response_format={"type": "json_object"} 
+            )
+        except:
+            # 👇 AUTOMATIC FALLBACK: If 70B is maxed out, use Llama 4 Scout instantly
+            print("\nPrimary model LIMTI REACHED! Changing to fallback model....\n")
+            chat_completion = client.chat.completions.create(
+                model=FALLBACK_MODEL,
+                messages=messages,
+                temperature=0.5,
+                max_completion_tokens=250,
+                # 👇 This forces Groq to return raw JSON matching your system prompt rules!
+                response_format={"type": "json_object"} 
+            )
         
-        if fn_name in Available_Tools:
-            output = Available_Tools.get('get_weather')['fn'](fn_input)
-            content = {
-                "step": "observe",
-                "response": output
-            }
-            messages.append({"role": "assistant", "content": json.dumps(content)})
+        print(chat_completion.choices[0].message.content)
+        print ("\n--------------\n")
+
+        parsed_resp = json.loads(chat_completion.choices[0].message.content) # Parsed response to a python object
+        step = parsed_resp.get('step')
+
+        messages.append({"role": "assistant", "content": chat_completion.choices[0].message.content})
+
+        if step == 'action':
+            fn_input = parsed_resp.get('input')
+            fn_name = parsed_resp.get('function')
+            
+            if fn_name in Available_Tools:
+                output = Available_Tools.get(fn_name)['fn'](fn_input)
+                content = {
+                    "step": "observe",
+                    "response": output
+                }
+                messages.append({"role": "assistant", "content": json.dumps(content)})
 
 
-    if parsed_resp.get('step') == 'output':
-        break
-    
-print("\nThe answer is complete.\n\n")
-# print (messages)
+        if parsed_resp.get('step') == 'output':
+            break
+        
+    print("\nThe answer is complete.\n\n")
+    # print (messages)
