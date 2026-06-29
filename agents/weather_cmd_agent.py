@@ -8,7 +8,6 @@ import requests
 import subprocess
 
 from groq import Groq
-
 from groq import RateLimitError # If the rate limit hits for one model, for that it is to handle that problem, and we can use a different model in this case.
 
 client = Groq(
@@ -107,7 +106,7 @@ while True:
                 # 👇 This forces Groq to return raw JSON matching your system prompt rules!
                 response_format={"type": "json_object"} 
             )
-        except:
+        except RateLimitError:
             # 👇 AUTOMATIC FALLBACK: If 70B is maxed out, use Llama 4 Scout instantly
             print("\nPrimary model LIMTI REACHED! Changing to fallback model....\n")
             chat_completion = client.chat.completions.create(
