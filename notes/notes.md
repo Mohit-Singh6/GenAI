@@ -90,5 +90,38 @@ Every time a output comes, we calculate the difference from the expected output 
 | **Autonomy** | Passive (Answers prompts) | Active (Runs in a loop until a goal is met) |
 
 
+### 1. Running an LLM Locally
+
+* **What it means:** Downloading an AI model directly onto your own computer or server hardware and running it without an internet connection.
+* **Why do it:** You get **100% data privacy** (your data never leaves your machine), it is **completely free** to use after you buy the hardware (no API token costs), and it can work fully offline.
+
+---
+
+### 2. Fine-Tuning an LLM
+
+* **What it means:** Taking an already trained, base AI model (like Llama or Mistral) and training it further on a specific, targeted dataset to alter its behavior.
+* **Why do it:** It adapts the model's core brain to master a **specific tone/style** (e.g., writing like *you*), follow a strict specialized output format, or master deep, niche industry terminology that it didn’t learn well during its initial training.
+
+---
+
+### You can:
+- Only do the inferencing of OpenAI LLM's
+- While you can also train/fine-tune open source LLM's (inference also possible - obviously). 
+
+
+## Ollama:
+
+**Ollama** is a lightweight tool used to download, install, and run Large Language Models (like Llama 3.3, Mistral, or Phi) **locally on your own computer**.
+
+It serves as the bridge that manages all the complex background setups so you don't have to deal with manual configurations.
+
+### Key Uses:
+
+* **One-Command Installation:** You can download and start chatting with an AI model via a single command (e.g., `ollama run llama3.3`).
+* **Local API Server:** It runs a background server on your machine that exposes an OpenAI-compatible API endpoint. This allows you to connect your local models straight to Python scripts, agents, or apps like VS Code without needing an internet connection.
+* **Hardware Optimization:** It automatically detects your machine's hardware (like an Nvidia GPU, Apple Silicon M-series chip, or CPU) and maximizes its speed out of the box.
+
+In short, it makes running a private, free AI on your own hardware as simple as running an app.
+
 
 ## Tooling:

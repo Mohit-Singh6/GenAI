@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()  # Load environment variables from .env file
 
 import time
+from groq import RateLimitError # If the rate limit hits for one model, for that it is to handle that problem, and we can use a different model in this case.
 
 
 # Directly take from grok python sdk (https://console.groq.com/docs/quickstart)
@@ -11,6 +12,10 @@ from groq import Groq
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY"),
 )
+
+PRIMARY_MODEL = "llama-3.3-70b-versatile"
+FALLBACK_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
+
 
 
 system_prompt = """
@@ -93,13 +98,23 @@ while True and maxCalls > 0:
     maxCalls -= 1 
 
         # Groq API call
-    chat_completion = client.chat.completions.create(
-        model="llama-3.3-70b-versatile", # Great for reasoning & JSON
-        messages=messages,
-        temperature=0.5,
-        max_completion_tokens=300,
-        # 👇 This forces Groq to return raw JSON matching your system prompt rules!
-    )
+    try: 
+        chat_completion = client.chat.completions.create(
+            model="llama-3.3-70b-versatile", # Great for reasoning & JSON
+            messages=messages,
+            temperature=0.5,
+            max_completion_tokens=300,
+            # 👇 This forces Groq to return raw JSON matching your system prompt rules!
+        )
+    except RateLimitError:
+        # 👇 AUTOMATIC FALLBACK: If 70B is maxed out, use Llama 4 Scout instantly
+            # print("\nPrimary model LIMIT REACHED! Changing to fallback model....\n")
+            chat_completion = client.chat.completions.create(
+                model=FALLBACK_MODEL,
+                messages=messages,
+                temperature=0.5,
+                max_completion_tokens=300,
+            )
 
     print("...")
     time.sleep(2)

@@ -2,21 +2,12 @@ import os
 from dotenv import load_dotenv
 load_dotenv() 
 
+import ollama
+
 import json
 import requests
 
 import subprocess
-
-from groq import Groq
-from groq import RateLimitError # If the rate limit hits for one model, for that it is to handle that problem, and we can use a different model in this case.
-
-client = Groq(
-    api_key=os.getenv("GROQ_API_KEY"),
-)
-
-# Define your primary and backup models
-PRIMARY_MODEL = "llama-3.3-70b-versatile"
-FALLBACK_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 
 def get_weather (city: str):
@@ -38,10 +29,6 @@ Available_Tools = {
     "get_weather": {
         "fn": get_weather,
         "description": "This function takes city as input and returns the weather in that city."
-    },
-    "run_command": {
-        "fn": run_command,
-        "description": "Runs command on the system by taking string of command as input"
     }
 }
 
@@ -50,6 +37,8 @@ system_prompt = """
     You are an ai expert in resolving user query. You work on these steps: start, plan, action, observe, analyze, output mode.
     Whenever a user queries something, you plan and analyze from the available tools that what tool will be used to solve that query.
     Then you call the appropriate function for that tool, then you observe it's response and write the appropriate output. Finally you return the required output.
+
+    Go through the steps in this order only ["start", "plan",..., "action", "observe", "analyze",..., "output"]
 
     Instructions:
     - Return the output in json format
@@ -63,13 +52,6 @@ system_prompt = """
 
     Available Tools:
     - get_weather: This function takes city as input and returns the weather in that city.
-    - run_command: Runs command on the system by taking string of command as input 
-
-    Important Note:
-    - when using the run_command tool, and using it to create or update any text in a file, don't add extra quotes or single quotes, because then they are also added in the file.
-    - Example: 
-        WRONG:  don't write the input as "echo 'Hello' > motivate.md" - this is wrong!
-        CORRECT: Write the input as "echo Hello > motivate.md"
 
     
     Example:
@@ -91,39 +73,26 @@ messages = [
 
 
 while True:
-    user_query = input("Enter query: ") # Create a new file named raju.txt in the current directory and write "Hello, RAJU!" in that file.
+    user_query = input("Enter query: ") # What is the weather in delhi in F and K?
 
     messages.append({"role": "user", "content": user_query})
 
     while True:
 
-        try:
-            chat_completion = client.chat.completions.create(
-                model=PRIMARY_MODEL,
-                messages=messages,
-                temperature=0.5,
-                max_completion_tokens=250,
-                # 👇 This forces Groq to return raw JSON matching your system prompt rules!
-                response_format={"type": "json_object"} 
-            )
-        except RateLimitError:
-            # 👇 AUTOMATIC FALLBACK: If 70B is maxed out, use Llama 4 Scout instantly
-            print("\nPrimary model LIMIT REACHED! Changing to fallback model....\n")
-            chat_completion = client.chat.completions.create(
-                model=FALLBACK_MODEL,
-                messages=messages,
-                temperature=0.5,
-                max_completion_tokens=250,
-                response_format={"type": "json_object"} 
-            )
-        
-        print(chat_completion.choices[0].message.content)
+        response = ollama.chat(
+            model="qwen2.5:3b",
+            messages=messages,
+            format="json",
+            options={"temperature": 0}
+        )
+    
+        print (response.message.content)
         print ("\n--------------\n")
 
-        parsed_resp = json.loads(chat_completion.choices[0].message.content) # Parsed response to a python object
+        parsed_resp = json.loads(response.message.content) # Parsed response to a python object
         step = parsed_resp.get('step')
 
-        messages.append({"role": "assistant", "content": chat_completion.choices[0].message.content})
+        messages.append({"role": "assistant", "content": response.message.content})
 
         if step == 'action':
             fn_input = parsed_resp.get('input')

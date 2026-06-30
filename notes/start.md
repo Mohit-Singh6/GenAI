@@ -61,3 +61,8 @@
     - load_dotenv()  # Load environment variables from .env file
 - pip install groq (becasue gemini fuk gaya)
 - Copy same things from docs (https://console.groq.com/docs/quickstart)
+
+
+### After a lot of time
+- go to google colab, take 1 gpu
+- !pip install transformers (library of hugging face)
