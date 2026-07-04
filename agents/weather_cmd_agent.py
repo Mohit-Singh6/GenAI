@@ -82,6 +82,9 @@ system_prompt = """
     Output: {{ "step": "analyze", "content": "The user wants to know the weather of delhi so the output should be The weather of Delhi is 35°C"}}
     Output: {{ "step": "output", "content": "The current weather in Delhi is 35°C."}}
 
+    If you have the answered a query before and the next query uses the same data or information, then you can use the previous output to answer the next query. You don't have to call the function again if you have already called it before.
+
+    Use the tools from avaialable tools only. Don't use any other tool or function if not specified. If any tool is not written then try to solve that query by yourself.
 """
 
 
@@ -142,4 +145,5 @@ while True:
             break
         
     print("\nThe answer is complete.\n\n")
-    # print (messages)
+    print (messages)
+    print ("\n--------------\n")

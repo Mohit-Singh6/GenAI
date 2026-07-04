@@ -4,9 +4,9 @@
 Yes, subprocess.run() is the single command that generally works for nearly all situations. It is the modern, safe, and flexible tool designed to replace almost all older Python methods. [1, 2] 
 To make it work for literally any Windows command (including built-in shell features), use this exact structure:
 
-import subprocess
+`import subprocess`
 # Replace 'your command here' with absolutely anything
-subprocess.run("your command here", shell=True, capture_output=True, text=True)
+`subprocess.run("your command here", shell=True, capture_output=True, text=True)`
 
 ## Why this specific combination works for everything:
 

@@ -125,3 +125,58 @@ In short, it makes running a private, free AI on your own hardware as simple as 
 
 
 ## Tooling:
+
+
+
+## Fine Tuning:
+- Base Model: A pre-trained LLM that has been trained on a large, general dataset. It has a broad understanding of language and can perform a wide range of tasks, but may not be specialized in any particular domain.
+- Transformers just predict the next words, the chatgpt and other chatbots are built on top of transformers, they are fine tuned to perform specific tasks like answering questions, generating code, etc.
+
+- Full parameter fine-tuning: Updating all the parameters of the base model during training. This allows the model to learn new patterns and adapt to the specific task, but it requires a large amount of data and computational resources.
+    - ***Problems:***
+        - High computational cost
+        - High hardware or GPU requirements
+        - Self Hosting needs to be done, because the model is too big to be hosted on cloud platforms like OpenAI or Hugging Face.
+
+    - Now for full seeing full parameter fine-tuning, you need GPU so go to google colab to check the code.
+        - **In google colab: Chat Template**
+            - Chat template => [{"role": "user", "content": "___"}]
+                - this is how you write generally, and the tokenizer will automatically convert this to the way the model understands it. So you don't have to worry about the tokenization process, the model will automatically understand it.
+            - Step 2: Prepare the dataset in the same format as the chat template, and then use the dataset to fine-tune the model.
+            - Step 3: full_conversation = input_detoken + output_label + tokenizer.eos_token 
+            - Step 4: Get the output, calculate the loss, and then backpropagate the loss to update the model's parameters. Do it like 10 times or so to get the model to learn the new patterns and adapt to the specific task.
+
+            - ***Cons: ***
+                - Accuracy is less
+
+    - OpenAI or Gemini like models don't let you fine tune their models, but they do let you give the data set file in .jsonl format, and they will do the fine tuning for you. Then you can use the fine tuned model for your specific task. But open source models like LLaMA, Mistral, etc. let you do full parameter fine tuning on your own hardware.
+
+    - There are websites like replicate, huggingface, etc. that let you do full parameter fine tuning on their cloud servers, but they charge you for it. So if you have the hardware and the data set, it is better to do it on your own hardware.
+
+- LoRA (Low-Rank Adaptation): A parameter-efficient fine-tuning method that updates only a small subset of the model's parameters. This allows for faster training and lower resource requirements, while still achieving good performance on the specific task.
+    - We will never change/update the base model's parameters
+    - Till the point of calculating the loss, the steps are the same, after that instead of back propagration (which uses GPU), we will store/track the differences in a new storage (delta), 2 + 2 = 100. Diff = 96, => 2 + 2 = 100 - 96 => 4.
+    - Takes up extra space but no need of GPU
+
+
+- Is giving system prompt fine tuning? No, it is not fine tuning, it is just giving the model a context or instruction to follow while generating the output. Fine tuning is done by training the model on a specific dataset to adapt its parameters to perform a specific task or follow a specific style. But on application level it is kind of fine tuning, because you are giving the model a specific instruction to follow while generating the output. 
+
+
+## RAG:
+- RAG (Retrieval-Augmented Generation) is a technique that combines the strengths of retrieval-based methods and generative models to improve the quality and relevance of generated responses. It allows the model to access external knowledge sources (like documents, databases, or APIs) during the generation process, enabling it to provide more accurate and contextually appropriate answers.
+
+### Difference between RAG and Fine Tuning:
+- RAG: The model retrieves relevant information from external sources during inference, allowing it to generate responses based on up-to-date knowledge without modifying its internal parameters. It is useful when the knowledge base is frequently changing.
+
+- Fine Tuning: The model's internal parameters are updated during training to adapt it to a specific task or domain. It is useful when the model needs to learn new patterns or behaviors that are not present in its original training data.
+
+### When to use RAG and when to use Fine Tuning:
+- Use RAG when you want to provide the model with access to external knowledge sources during inference, allowing it to generate responses based on up-to-date information without modifying its internal parameters. It is useful when the knowledge base is frequently changing or when user can ask kind of anything.
+
+- Use Fine Tuning when you want to adapt the model to a specific task or domain by updating its internal parameters during training. It is useful when the model needs to learn new patterns or behaviors that are not present in its original training data. You just feed it the data set and it will learn the new patterns and adapt to the specific task. You can't do fine tuning frequently as it is costly and time consuming.
+
+## Gemini, Claude - all these have OpenAI compatible API's, so you can use them in the same way as you use OpenAI API's. You just have to change the API endpoint (or base URL) and the API key. The rest of the code will remain the same.
+- Using openAI's sdk you can call the API's of other models like Gemini, Claude, etc. without changing the code. 
+
+## What is SDK in simple terms:
+- SDK (Software Development Kit) is a set of tools, libraries, and documentation provided by a company (like OpenAI) to help developers build applications that use their services.
