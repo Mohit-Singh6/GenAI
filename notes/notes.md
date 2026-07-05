@@ -180,3 +180,40 @@ In short, it makes running a private, free AI on your own hardware as simple as 
 
 ## What is SDK in simple terms:
 - SDK (Software Development Kit) is a set of tools, libraries, and documentation provided by a company (like OpenAI) to help developers build applications that use their services.
+
+## RAG:
+- ***Context Window***
+    - The context window is the maximum number of tokens (words or pieces of words) that a language model can consider at once when generating a response. It defines how much of the conversation history or input text the model can "see" and use to generate its output.
+        - Due to this limitation, we need to optimize the RAG process to ensure that the most relevant information is included in the context window for generating accurate and coherent responses because the data can be very large.
+            
+    - Retrieving the most relevant information from a large dataset and including it in the context window to get the best result for the query is called RAG (Retrieval-Augmented Generation). 
+
+    - Regex: Regex, short for Regular Expression, is a sequence of characters that forms a search pattern used to find, manipulate, or validate text strings.
+        Ex: %Mohit% - will match any string that contains "Mohit" in it. 
+
+    - ***Use Case or Example of RAG***:
+        - Suppose you have a pdf document and you have to answer a query related to that document:
+            - Case 1: PDF is small like 1-2 pages, then you can directly feed the whole document to the model and it will give you the answer. Because the whole document will fit in the context window of the model.
+
+            - Case 2: PDF is large like 1000 pages, then you can't feed the whole document to the model because it will exceed the context window of the model. So you have to use RAG to retrieve the most relevant information from the document and feed it to the model to get the answer.
+                - To feed the most relevant info, we perform something called **INDEXING**. Indexing is a process and it can be of different types, here we will do it by dividing the document into smaller chunks and storing them in a vector database. 
+                - STEPS: 
+                    1. Chunking: Break the large document into smaller chunks of text
+                    2. Embedding: Convert each chunk into a vector using an embedding model
+                    3. Store these vectors in a vector database
+
+                - Now user makes a query:
+                    1. Query Embedding: Convert the user's query into a vector using the same embedding model
+                    2. Similarity Search: Search the vector database for the most similar vectors to the query vector
+                    3. From the previous step, we get the most relevant chunks of text from the document. Now we feed these chunks to the model to get the answer to the user's query.
+
+    - ***Why do we need LangChain?***
+        -  def load_pdf  
+           def split_pdf  
+           def convert_chunk_to_embedding  
+           def save_to_pinecone  
+           def search_pincode  
+           def get_cunk  
+           def chat  
+
+            - All these functions are required to perform RAG, but if you have to write all these functions from scratch, it will take a lot of time and effort. And some of these functions have to be written separately for different formats like pdf, docx, txt, etc. So we need a framework that can handle all these functions and provide a unified interface to perform RAG. 
