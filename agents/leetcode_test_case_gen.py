@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 load_dotenv() 
 
 import json
-import requests
 
+import requests
 import subprocess
 
 from groq import Groq

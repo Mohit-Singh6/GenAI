@@ -4,13 +4,16 @@ Here is the complete, deep-dive breakdown of Google’s flagship embedding engin
 
 ## 1. Limits & Constraints
 
+
+# Check all the limits from: https://aistudio.google.com/rate-limit?_gl=1*hd59db*_ga*OTUyNDQ0MzI2LjE3ODI2NTEyMDg.*_ga_P1DBVKWT6V*czE3ODM0MTYyMjIkbzUkZzEkdDE3ODM0MTc4NDQkajQ1JGwwJGg0MDMxOTU3MjM.&timeRange=last-28-days&project=gen-lang-client-0610661201
+
+
 Google designed its second-generation embedding engine to handle complex enterprise workflows, resulting in a significantly expanded data capacity compared to legacy models.
 
 ### Quota Caps (Free Tier)
 
-* **RPM (Requests Per Minute):** **40,000 requests** per minute.
-* **TPM (Tokens Per Minute):** **10,000,000 tokens** per minute (approximately **7.5 million words** per minute).
-* **RPD (Requests Per Day):** No specific text limit is hard-capped daily, but users are bound by the high RPM/TPM limits. (Google handles this dynamically via a large, shared free resource pool).
+* **RPM (Requests Per Minute):** **100 requests** per minute.
+* **TPM (Tokens Per Minute):** **30,000 tokens** per minute (30K tokens = ~22,500 words, roughly 45 to 55 pages). If you exceed this, the API will return a `429 Too Many Requests` error.
 
 ### The Input Context Window (Token Limit)
 
