@@ -1,0 +1,33 @@
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Messages</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Text</th>
+            <th>Actions</th>
+        </tr>
+        {% for message in messages %}
+        <tr>
+            <td>{{ message.id }}</td>
+            <td>{{ message.text }}</td>
+            <td>
+                <a href="{{ url_for('edit', id=message.id) }}">Edit</a>
+                <a href="{{ url_for('delete', id=message.id) }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p><a href="{{ url_for('create') }}">Create New Message</a></p>
+</body>
+</html>
+
+    
