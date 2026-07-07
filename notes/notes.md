@@ -203,7 +203,7 @@ In short, it makes running a private, free AI on your own hardware as simple as 
                     3. Store these vectors in a vector database
 
                 - Now user makes a query:
-                    1. Query Embedding: Convert the user's query into a vector using the same embedding model
+                    1. Query Embedding: Convert the user's query into a vector embeddings using the same embedding model
                     2. Similarity Search: Search the vector database for the most similar vectors to the query vector
                     3. From the previous step, we get the most relevant chunks of text from the document. Now we feed these chunks to the model to get the answer to the user's query.
 
