@@ -21,10 +21,10 @@
 
     - **Query Decomposition**: Till now we weren't doing any abstraction or less abstraction things:
         - ***Abstraction***:
-                 |
-                 To
-                 |
-                 V
+                |
+                To
+                |
+                V
         - ***Less Abstraction***: 
             - **CoT (Chain of Thought)**: In this approach, we can ask the AI to generate the answer in a step by step manner. This will help the AI to think more and generate a better answer. [Breaking down the problem into smaller sub-problems]
 

@@ -100,7 +100,7 @@ messages = [
 
 
 while True:
-    user_query = input("Enter query: ")  # Sets in python
+    user_query = input("Enter query: ")  # How to delete an element in array in python
 
     messages.append({"role": "user", "content": user_query})
 
@@ -135,21 +135,35 @@ while True:
         response = parsed_resp.get("response")
 
         if get_data is not None:
-            data = set()
-
-            # 1. Convert the vector store into a retriever object
+            # 1. Fetch search results concurrently using the retriever
             retriever = doc_store.as_retriever()
-            
-            # 2. Use .batch() directly on the retriever wrapper, this will run the similarity search in parallel for all queries in the list. It takes a simple list of string queries
-            # It takes a simple list of string queries
             retrieved_docs_groups = retriever.batch(get_data)
             
-            # 3. Flatten the groups of documents into a unique set of text chunks
-            data = {doc.page_content for group in retrieved_docs_groups for doc in group}
-
-                
-            data_arr = list(data)
-            content = {"output": data_arr}
+            # 2. Reciprocal Rank Fusion (RRF) Implementation
+            rrf_scores = {}
+            k = 60  # Standard RRF constant parameter
+            
+            # Iterate through each query's ranked list of documents
+            for group in retrieved_docs_groups:
+                for rank, doc in enumerate(group, start=1):
+                    # Use the page content string as a unique key for the document
+                    doc_content = doc.page_content
+                    
+                    # Calculate the reciprocal rank score contribution
+                    reciprocal_score = 1.0 / (k + rank)
+                    
+                    if doc_content in rrf_scores:
+                        rrf_scores[doc_content] += reciprocal_score
+                    else:
+                        rrf_scores[doc_content] = reciprocal_score
+            
+            # 3. Sort documents based on their combined RRF score in descending order
+            sorted_docs = sorted(rrf_scores.items(), key=lambda item: item[1], reverse=True)
+            
+            # 4. Take the top results (e.g., top 4 most relevant chunks total)
+            top_k_results = [doc_content for doc_content, score in sorted_docs[:4]]
+            
+            content = {"output": top_k_results}
             messages.append({"role": "assistant", "content": json.dumps(content)})
 
             print(messages[-1])
